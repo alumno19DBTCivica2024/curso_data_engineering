@@ -1,0 +1,22 @@
+version: 1
+
+models:
+    - name: stg_sql_server_dbo__promos
+      columns:
+        - name: promo_id
+        - name: discount
+        - name: status
+        - name: is_deleted
+        - name: date_load
+    - name: stg_sql_server_dbo__addresses
+      columns:
+        - name: address_id
+        - name: zipcode_id
+        - name: zipcode_desc
+        - name: country_id
+        - name: country_desc
+        - name: address
+        - name: state_id
+        - name: state_desc
+        - name: is_deleted
+        - name: date_load
