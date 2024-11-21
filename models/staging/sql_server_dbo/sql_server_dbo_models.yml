@@ -23,15 +23,49 @@ models:
     - name: stg_sql_server_dbo__users
       columns:
         - name: user_id
-        - name: updated_at
+        - name: updated_at_utc
         - name: address_id
         - name: last_name
-        - name: created_at
+        - name: created_at_utc
         - name: phone_number
         - name: first_name
         - name: email
         - name: is_deleted
         - name: date_load
     - name: stg_sql_server_dbo__products
-    #- name: stg_sql_server_dbo__orders
-    #- name: stg_sql_server_dbo__order_items
+      columns:
+        - name: product_id
+        - name: name
+        - name: price
+        - name: inventory
+        - name: stock_status
+        - name: is_deleted
+        - name: date_load
+        - name: status
+    - name: stg_sql_server_dbo__orders
+      columns:
+        - name: order_id
+        - name: shipping_service_id
+        - name: shipping_service_desc
+        - name: shipping_cost_usd
+        - name: address_id
+        - name: created_at_utc
+        - name: promo_id
+        - name: estimated_delivery_at_utc
+        - name: item_order_cost_usd
+        - name: user_id
+        - name: total_order_cost_usd
+        - name: delivered_at_utc
+        - name: tracking_id
+        - name: status
+        - name: is_deleted
+        - name: date_load
+    - name: stg_sql_server_dbo__order_items
+      columns:
+        - name: order_id
+        - name: product_id
+        - name: quantity
+        - name: valid_order
+        - name: valid_product
+        - name: is_deleted
+        - name: date_load

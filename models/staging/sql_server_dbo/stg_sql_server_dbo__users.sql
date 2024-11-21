@@ -22,9 +22,10 @@ with src_promos as (
 users_transformado as (
     select
         USER_ID,
-        UPDATED_AT,
+        CONVERT_TIMEZONE('UTC', UPDATED_AT) AS UPDATED_AT_UTC,
+        ADDRESS_ID,
         LAST_NAME,
-        CREATED_AT,
+        CONVERT_TIMEZONE('UTC', CREATED_AT) AS CREATED_AT_UTC,
         PHONE_NUMBER,
         FIRST_NAME,
         EMAIL,
