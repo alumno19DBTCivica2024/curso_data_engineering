@@ -18,18 +18,21 @@ renamed_casted AS (
             WHEN TRIM(SHIPPING_SERVICE) = '' THEN UPPER('Not set yet')
             ELSE UPPER(SHIPPING_SERVICE)
         END AS SHIPPING_SERVICE_DESC,
-        SHIPPING_COST,
+        SHIPPING_COST AS SHIPPING_COST_USD,
         ADDRESS_ID,
-        CREATED_AT,
+        --CREATED_AT,
+        CONVERT_TIMEZONE('UTC', CREATED_AT) AS CREATED_AT_UTC,
         CASE 
             WHEN TRIM(PROMO_ID) = '' THEN {{ dbt_utils.generate_surrogate_key(['null']) }}
             ELSE {{ dbt_utils.generate_surrogate_key(['PROMO_ID']) }}
         END AS PROMO_ID,
-        ESTIMATED_DELIVERY_AT,
-        ORDER_COST,
+        --ESTIMATED_DELIVERY_AT,
+        CONVERT_TIMEZONE('UTC', ESTIMATED_DELIVERY_AT) AS ESTIMATED_DELIVERY_AT_UTC,
+        ORDER_COST AS ITEM_ORDER_COST_USD,
         USER_ID,
-        ORDER_TOTAL,
-        DELIVERED_AT,
+        ORDER_TOTAL as TOTAL_ORDER_COST_USD,
+        --DELIVERED_AT,
+        CONVERT_TIMEZONE('UTC', DELIVERED_AT) AS DELIVERED_AT_UTC,
         TRACKING_ID,
         UPPER(STATUS) as STATUS,
         UPPER(COALESCE(_FIVETRAN_DELETED, 'false')) as IS_DELETED,
