@@ -20,3 +20,18 @@ models:
         - name: state_desc
         - name: is_deleted
         - name: date_load
+    - name: stg_sql_server_dbo__users
+      columns:
+        - name: user_id
+        - name: updated_at
+        - name: address_id
+        - name: last_name
+        - name: created_at
+        - name: phone_number
+        - name: first_name
+        - name: email
+        - name: is_deleted
+        - name: date_load
+    - name: stg_sql_server_dbo__products
+    #- name: stg_sql_server_dbo__orders
+    #- name: stg_sql_server_dbo__order_items
