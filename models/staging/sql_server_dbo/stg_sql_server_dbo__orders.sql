@@ -12,6 +12,7 @@ WITH src_orders AS (
 renamed_casted AS (
     SELECT 
         -- Incluir el resto de las columnas tal cual
+        ORDER_ID,
         {{ dbt_utils.generate_surrogate_key(['SHIPPING_SERVICE']) }} AS SHIPPING_SERVICE_ID,
         CASE 
             WHEN TRIM(SHIPPING_SERVICE) = '' THEN UPPER('Not set yet')
