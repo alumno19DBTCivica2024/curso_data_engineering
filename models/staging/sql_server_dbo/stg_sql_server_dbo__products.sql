@@ -39,6 +39,20 @@ products_transformado as (
             ELSE 'ACTIVE'
         END AS STATUS -- Marca de registros eliminados
     from src_products
+
+    union all
+
+    -- Fila adicional con PROMO_NAME = 'sin promo' y PROMO_ID generado aleatoriamente
+    select
+        --md5(random()) as PROMO_ID,   -- Genera un PROMO_ID aleatorio
+        {{ dbt_utils.generate_surrogate_key(['null']) }} as PRODUCT_ID,
+        UPPER('sin producto') as NAME,
+        '0.0' AS PRICE,
+        '0' AS INVENTORY,
+        'NO STOCK' AS STOCK_STATUS,
+        'FALSE' AS IS_DELETED,
+        convert_timezone('Europe/Berlin', current_timestamp()) as DATE_LOAD,
+        'INACTIVE' AS STATUS
 )
 
 select * from products_transformado
