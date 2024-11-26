@@ -4,6 +4,9 @@ models:
     - name: stg_sql_server_dbo__promos
       columns:
         - name: promo_id
+          tests:
+            - unique
+            - not_null
         - name: discount
         - name: status
         - name: is_deleted
@@ -11,6 +14,9 @@ models:
     - name: stg_sql_server_dbo__addresses
       columns:
         - name: address_id
+          tests:
+            - not_null
+            - unique
         - name: zipcode_id
         - name: zipcode_desc
         - name: country_id
