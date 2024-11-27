@@ -3,6 +3,8 @@ version: 2
 sources:
 
   - name: sql_server_dbo # name of the source 
+    description: >
+        Raw data demo from Database SQL SERVER DBO
     schema: sql_server_dbo # this is the schema our raw data lives in
     database: ALUMNO19_DEV_BRONZE_DB # this is the name of our database
 
@@ -18,6 +20,8 @@ sources:
     tables:
 
       - name: addresses
+        description: >
+          Datos sobre direcciones (usuarios, órdenes).
         loaded_at_field: _fivetran_synced
         columns:
           - name: address_id
@@ -31,6 +35,8 @@ sources:
           - name: _fivetran_deleted
           - name: _fivetran_synced
       - name: events
+        description: >
+          Datos sobre eventos en la web.
         loaded_at_field: _fivetran_synced
         columns:
           - name: event_id
