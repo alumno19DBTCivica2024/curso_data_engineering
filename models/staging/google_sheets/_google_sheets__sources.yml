@@ -14,8 +14,8 @@ sources:
       identifier: false
 
     freshness:
-      warn_after: {count: 24, period: day}
-      error_after: {count: 48, period: day}
+      warn_after: {count: 24, period: hour}
+      error_after: {count: 48, period: hour}
 
     tables:
 
@@ -25,26 +25,29 @@ sources:
           Data about budget in demo.
         columns:
           - name: _row
-            tests:
-                - unique
-                - not_null
             description: >
               Number of each row from google sheet.
-          - name: product_id
             tests:
-              - relationships:
-                  to: source('sql_server_db','products')
-                  field: product_id
+              - not_null
+              - unique
+          - name: product_id
             description: >
               UUID for each unique product on platform.
-          - name: quantity
             tests:
-                - positive_values
+              - not_null
+          - name: quantity
             description: >
               Number of units for each product and each month for products.
+            tests:
+              - not_null
+              - positive_values
           - name: month
             description: >
               Each month for the budget -> End of the month.
+            tests:
+              - not_null
           - name: _fivetran_synced
             description: >
               Date that the data was loaded.
+            tests:
+              - not_null
