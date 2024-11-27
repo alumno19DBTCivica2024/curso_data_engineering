@@ -25,65 +25,117 @@ sources:
         loaded_at_field: _fivetran_synced
         columns:
           - name: address_id
+            description: >
+              Id de la direccion.
             tests:
               - not_null
               - unique
           - name: zipcode
+            description: >
+              Codigo postal
           - name: country
+            description: >
+              Nombre del país.
           - name: address
+            description: >
+              Descripción de la dirección (num y calle)
           - name: state
+            description: >
+              Nombre del estado (de EEUU)
           - name: _fivetran_deleted
+            description: >
+              Registro generado por Fivetran sobre si ha sido eliminado en el sistema de origen
           - name: _fivetran_synced
+            description: >
+              Registro generado por Fivetran de la última sincronización exitosa de un registro con Fivetran
       - name: events
         description: >
-          Datos sobre eventos en la web.
+          Eventos web de los usuarios relacionados con los productos de un pedido (checkout,package_shipped,add_to_cart,page_view)
         loaded_at_field: _fivetran_synced
         columns:
           - name: event_id
+            description: >
+              Id de evento web.
             tests:
               - not_null
               - unique
           - name: page_url
+            description: >
+              URL de la página web.
           - name: event_type
+            description: >
+              Tipo de evento web lanzado.
           - name: user_id
+            description: >
+              Id de usuario.
           - name: product_id
+            description: >
+              Id de producto
             tests:
               - relationships:
                   to: source('sql_server_db','products')
                   field: product_id
           - name: session_id
+            description: >
+              Id de sesion de usuario en la web.
           - name: created_at
+            description: >
+              Hora de creación/realización del evento.
           - name: order_id
+            description: >
+              Id del pedido.
             tests:
               - relationships:
                   to: source('sql_server_db','orders')
                   field: ref('order_id')
           - name: _fivetran_deleted
+            description: >
+              Registro generado por Fivetran sobre si ha sido eliminado en el sistema de origen
           - name: _fivetran_synced
+            description: >
+              Registro generado por Fivetran de la última sincronización exitosa de un registro con Fivetran
       - name: orders
+        description: >
+          Tabla relacionada con los pedidos realizados a nivel genérico.
         loaded_at_field: _fivetran_synced
         columns:
           - name: order_id
+            description: >
+              Id del pedido
             tests:
               - unique
               - not_null
           - name: shipping_service
+            description:  >
+              Empresa de delivery asociada al pedido.
           - name: shipping_cost
+            description: >
+              Gastos de envío.
             tests:
               - positive_values
           - name: address_id
+            description: >
+              Id de la dirección a la que se realiza el envío.
             tests:
               - relationships:
                   to: source('sql_server_dbo', 'adresses')
                   field: address_id
           - name: created_at 
+            description: >
+              Hora de creación del pedido.
           - name: promo_id
+            description: >
+              Id de la promoción aplicada al peido en general.
             tests:
               - relationships:
                   to: source('sql_server_dbo','promos')
                   field: promo_id
           - name: estimated_delivery_at
+            description: >
+              Hora estimada de envío de la orden
           - name: order_cost
+            description: >
+              Coste total de los productos del orden (sin precio de envio)
             tests:
               - positive_values
           - name: user_id
@@ -92,73 +144,145 @@ sources:
                   to: source('sql_server_dbo','users')
                   field: user_id
           - name: order_total
+            description: >
+              Coste total del orden sumando el precio de envío.
             tests:
               - positive_values
           - name: delivered_at
+            description: >
+              Hora a la que se realizó la entrega del pedido.
           - name: tracking_id
+            description: >
+              Id de tracking del pedido.
           - name: status
+            description: >
+              Estado del pedido (delivered, preparing, shipped)
           - name: _fivetran_deleted
-          - name: _fivetran_synced          
+            description: >
+              Registro generado por Fivetran sobre si ha sido eliminado en el sistema de origen
+          - name: _fivetran_synced  
+            description: >
+              Registro generado por Fivetran de la última sincronización exitosa de un registro con Fivetran        
       - name: order_items
+        description: >
+          Tabla relacionada con los productos que hay a nivel de pedido.
         loaded_at_field: _fivetran_synced
         columns:
           - name: order_id
+            description: >
+              Id del pedido general.
             tests:
               - relationships:
                   to: source('sql_server_dbo', 'orders')
                   field: order_id
           - name: product_id
+            description: >
+              Id del producto encontrado en un pedido.
             tests:
               - relationships:
                   to: source('sql_server_dbo','products')
                   field: product_id
           - name: quantity
+            description: >
+              Cantidad que se ha pedido de un producto en un pedido.
             tests:
               - positive_values
           - name: _fivetran_deleted
+            description: >
+              Registro generado por Fivetran sobre si ha sido eliminado en el sistema de origen
           - name: _fivetran_synced 
+            description: >
+              Registro generado por Fivetran de la última sincronización exitosa de un registro con Fivetran 
       - name: products
+        description: >
+          Tabla relacionada con los productos ofertados.
         loaded_at_field: _fivetran_synced
         columns:
           - name: product_id
+            description: >
+              Id del producto ofertado.
             tests:
               - unique
               - not_null
           - name: price
+            description: >
+              Precio de venta al publico del producto.
             tests:
               - positive_values
           - name: name
+            description: >
+              Nombre del producto.
           - name: inventory
+            description: >
+              Inventario (stock) existente del producto.
             tests:
               - positive_values
           - name: _fivetran_deleted
-          - name: _fivetran_synced           
+            description: >
+              Registro generado por Fivetran sobre si ha sido eliminado en el sistema de origen
+          - name: _fivetran_synced
+            description: >
+              Registro generado por Fivetran de la última sincronización exitosa de un registro con Fivetran           
       - name: promos
+        description: >
+          Tabla relacionada con las promos ofrecidas a los clientes en el contexto de los pedidos y afectando al precio final de los mismos.
         loaded_at_field: _fivetran_synced
         columns:
           - name: promo_id
+            description: >
+              Id de la promoción
             tests:
               - not_null
               - unique 
           - name: discount
+            description: >
+              Descuento aplicado al precio del producto
             tests:
               - positive_values
           - name: status
+            description: >
+              Estado de la promoción
           - name: _fivetran_deleted
-          - name: _fivetran_synced             
+            description: >
+              Registro generado por Fivetran sobre si ha sido eliminado en el sistema de origen
+          - name: _fivetran_synced      
+            description: >
+              Registro generado por Fivetran de la última sincronización exitosa de un registro con Fivetran       
       - name: users
+        description: >
+          Tabla relacionadas con los usuarios , que son los clientes de la web .
         loaded_at_field: _fivetran_synced
         columns:
           - name: user_id
+            description: >
+              Id del usuario
             tests:
               - not_null 
               - unique
           - name: updated_at
+            description: >
+              Fecha de actualizacion del usuario.
           - name: address_id
+            description: >
+              Id de la dirección asociada a la dirección donde el usuario quiere que se le envíen los pedidos.
           - name: last_name
+            description: >
+              Apellido del usuario cliente.
           - name: created_at
+            description: >
+              Fecha de alta/creación del usuario en la web.
           - name: phone_numbers
+            description: >
+              Teléfono(s) de contacto asociado al cliente.
           - name: total_orders
+            description: >
+              Total de pedidos realizados por el usuario.
           - name: first_name
+            description: >
+              Nombre del usuario.
           - name: _fivetran_deleted
+            description: >
+              Registro generado por Fivetran sobre si ha sido eliminado en el sistema de origen
           - name: _fivetran_synced             
+            description: >
+              Registro generado por Fivetran de la última sincronización exitosa de un registro con Fivetran.

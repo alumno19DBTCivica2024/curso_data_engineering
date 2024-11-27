@@ -97,7 +97,7 @@ SELECT
     user_id,
     product_id,
     session_id,
-    created_at_utc
+    created_at_utc,
     order_id,
     is_deleted,
     date_load

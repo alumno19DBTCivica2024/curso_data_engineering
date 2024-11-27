@@ -14,105 +14,218 @@ models:
     - name: stg_sql_server_dbo__addresses
       columns:
         - name: address_id
+          description: >
+              Id de la direccion.
           tests:
             - not_null
             - unique
         - name: zipcode_id
+          description: >
+              Id de Codigo postal
         - name: zipcode_desc
+          description: >
+              Descripción de Codigo postal
         - name: country_id
+          description: >
+            Id de país
         - name: country_desc
+          description: >
+            Descripción del país.
         - name: address
+          description: >
+            Descripción de la dirección (num y calle)
         - name: state_id
+          description: >
+            Id del país
         - name: state_desc
+          description: >
+            Descripción del país.
         - name: is_deleted
+          description: >
+            Valor booleano que indica si el registro está borrado o no.
         - name: date_load
+          description: >
+            Fecha en la que se cargo el registro.
     - name: stg_sql_server_dbo__users
+      description: >
+        Modelo staging que contiene información de los usuarios. 
       columns:
         - name: user_id
+          description: >
+            Identificador único del usuario.
           tests:
             - unique
             - not_null
         - name: updated_at_utc
+          description: >
+            Fecha y hora en formato UTC en que el registro fue actualizado por última vez.
         - name: address_id
+          description: >
+            Identificador de la dirección asociada al usuario.
         - name: last_name
+          description: >
+            Apellido del usuario.
         - name: created_at_utc
+          description: >
+            Fecha y hora en formato UTC en que el usuario fue creado en el sistema de origen.
         - name: phone_number
+          description: >
+            Número de teléfono del usuario.
         - name: first_name
+          description: >
+            Nombre del usuario.
         - name: email
+          description: >
+            Dirección de correo electrónico del usuario.
           tests:
             - email_format
         - name: is_deleted
+          description: >
+            Indicador booleano que identifica si el registro ha sido marcado como eliminado.
         - name: date_load
+          description: >
+            Fecha en la que el registro fue cargado en el sistema staging.
     - name: stg_sql_server_dbo__products
+      description: >
+        Modelo staging que contiene información de los productos disponibles en el sistema de origen.
+        Incluye detalles sobre el precio, inventario y estado de los productos.
       columns:
         - name: product_id
+          description: >
+            Identificador único del producto.
           tests:
             - not_null
-            - unique 
+            - unique
         - name: name
+          description: >
+            Nombre del producto.
         - name: price
-          tests: 
+          description: >
+            Precio unitario del producto.
+          tests:
             - positive_values
         - name: inventory
-          tests: 
+          description: >
+            Cantidad disponible en inventario del producto.
+          tests:
             - positive_values
         - name: stock_status
+          description: >
+            Estado del inventario del producto (e.g., disponible, agotado).
         - name: is_deleted
+          description: >
+            Indicador booleano que identifica si el producto ha sido marcado como eliminado.
         - name: date_load
+          description: >
+            Fecha en la que el registro fue cargado en el sistema staging.
         - name: status
+          description: >
+            Estado general del producto.
     - name: stg_sql_server_dbo__orders
+      description: >
+        Modelo staging que contiene información sobre las órdenes realizadas por los usuarios.
+        Este modelo incluye datos como costos, promociones aplicadas, y detalles de envío.
       columns:
         - name: order_id
+          description: >
+            Identificador único de la orden.
           tests:
             - not_null
             - unique
         - name: shipping_service_id
+          description: >
+            Identificador del servicio de envío utilizado.
         - name: shipping_service_desc
+          description: >
+            Descripción del servicio de envío.
         - name: shipping_cost_usd
+          description: >
+            Costo del envío en dólares estadounidenses.
         - name: address_id
+          description: >
+            Identificador de la dirección de envío asociada a la orden.
           tests:
             - relationships:
                 to: ref('stg_sql_server_dbo__addresses')
-                field: address_id 
+                field: address_id
         - name: created_at_utc
+          description: >
+            Fecha y hora en formato UTC en que la orden fue creada.
         - name: promo_id
+          description: >
+            Identificador de la promoción aplicada a la orden.
           tests:
             - relationships:
                 to: ref('stg_sql_server_dbo__promos')
-                field: promo_id         
+                field: promo_id
         - name: estimated_delivery_at_utc
+          description: >
+            Fecha estimada de entrega en formato UTC.
         - name: item_order_cost_usd
+          description: >
+            Costo de los artículos en la orden, en dólares estadounidenses.
           tests:
             - positive_values
         - name: user_id
+          description: >
+            Identificador del usuario que realizó la orden.
           tests:
             - relationships:
                 to: ref('stg_sql_server_dbo__users')
-                field: user_id   
+                field: user_id
         - name: total_order_cost_usd
+          description: >
+            Costo total de la orden, incluyendo envío y promociones aplicadas, en dólares estadounidenses.
           tests:
             - positive_values
         - name: delivered_at_utc
+          description: >
+            Fecha y hora en formato UTC en que la orden fue entregada.
         - name: tracking_id
+          description: >
+            Identificador de seguimiento para la orden.
         - name: status
+          description: >
+            Estado de la orden (e.g., pendiente, completada, cancelada).
         - name: is_deleted
+          description: >
+            Indicador booleano que identifica si la orden ha sido marcada como eliminada.
         - name: date_load
+          description: >
+            Fecha en la que el registro fue cargado en el sistema staging.
     - name: stg_sql_server_dbo__order_items
+      description: >
+        Modelo staging que contiene información sobre los artículos incluidos en cada orden.
+        Este modelo detalla las cantidades y productos específicos asociados a las órdenes.
       columns:
         - name: order_id
+          description: >
+            Identificador de la orden a la que pertenece el artículo.
           tests:
-              - relationships:
-                  to: ref('stg_sql_server_dbo__orders')
-                  field: order_id           
+            - relationships:
+                to: ref('stg_sql_server_dbo__orders')
+                field: order_id
         - name: product_id
+          description: >
+            Identificador del producto incluido en la orden.
           tests:
-              - relationships:
-                  to: ref('stg_sql_server_dbo__products')
-                  field: product_id  
+            - relationships:
+                to: ref('stg_sql_server_dbo__products')
+                field: product_id
         - name: quantity
+          description: >
+            Cantidad del producto incluido en la orden.
           tests:
             - positive_values
         - name: valid_order
+          description: >
+            Indicador que verifica si la orden es válida.
         - name: valid_product
+          description: >
+            Indicador que verifica si el producto es válido.
         - name: is_deleted
+          description: >
+            Indicador booleano que identifica si el artículo ha sido marcado como eliminado.
         - name: date_load
+          description: >
+            Fecha en la que el registro fue cargado en el sistema staging    
