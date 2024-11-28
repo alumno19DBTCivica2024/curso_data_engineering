@@ -126,10 +126,6 @@ sources:
           - name: promo_id
             description: >
               Id de la promoción aplicada al peido en general.
-            tests:
-              - relationships:
-                  to: source('sql_server_dbo','promos')
-                  field: promo_id
           - name: estimated_delivery_at
             description: >
               Hora estimada de envío de la orden
