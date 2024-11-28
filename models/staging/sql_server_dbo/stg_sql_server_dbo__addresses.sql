@@ -19,7 +19,6 @@ renamed_addresses_casted AS (
           UPPER(ADDRESS) AS ADDRESS,
           md5(cast(coalesce(cast(STATE as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) as STATE_ID, -- Genera un hash basado en el valor de STATE original
           UPPER(STATE) AS STATE_DESC,
-          UPPER(COALESCE(_FIVETRAN_DELETED, 'false')) as IS_DELETED, -- Reemplaza NULL con 'N/A'
           _FIVETRAN_SYNCED  as DATE_LOAD
     FROM src_addresses
     )

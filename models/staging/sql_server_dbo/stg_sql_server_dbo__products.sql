@@ -32,7 +32,6 @@ products_transformado as (
             WHEN INVENTORY = 0 THEN UPPER('Out of Stock')
             ELSE UPPER('In Stock')
         END AS STOCK_STATUS, -- Estado del inventario
-        UPPER(COALESCE(IS_DELETED, 'FALSE')) AS IS_DELETED,
         DATE_LOAD,
         CASE 
             WHEN IS_DELETED = TRUE THEN 'DELETED'
@@ -50,7 +49,6 @@ products_transformado as (
         '0.0' AS PRICE,
         '0' AS INVENTORY,
         'NO STOCK' AS STOCK_STATUS,
-        'FALSE' AS IS_DELETED,
         convert_timezone('Europe/Berlin', current_timestamp()) as DATE_LOAD,
         'INACTIVE' AS STATUS
 )

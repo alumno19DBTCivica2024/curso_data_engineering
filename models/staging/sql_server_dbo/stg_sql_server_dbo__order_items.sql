@@ -44,7 +44,6 @@ renamed_casted AS (
             ) THEN TRUE 
             ELSE FALSE 
         END AS VALID_PRODUCT,
-        UPPER(COALESCE(_FIVETRAN_DELETED, 'false')) as IS_DELETED,
         _FIVETRAN_SYNCED AS DATE_LOAD
     FROM src_order_items c
 )

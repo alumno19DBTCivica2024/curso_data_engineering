@@ -3,7 +3,7 @@ WITH stg_users AS (
     FROM {{ ref('stg_sql_server_dbo__users') }}
     ),
 
-renamed_casted AS (
+dim_users_gold AS (
     SELECT
         user_id
         , first_name
@@ -17,4 +17,4 @@ renamed_casted AS (
     FROM stg_users
     )
 
-SELECT * FROM renamed_casted
+SELECT * FROM dim_users_gold

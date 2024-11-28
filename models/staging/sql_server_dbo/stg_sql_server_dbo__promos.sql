@@ -16,7 +16,6 @@ promos_transformado as (
         UPPER(PROMO_NAME) AS PROMO_NAME,
         DISCOUNT/100 as DISCOUNT,
         UPPER(STATUS) AS STATUS,
-        UPPER(IS_DELETED),
         DATE_LOAD
     from src_promos
 
@@ -29,7 +28,6 @@ promos_transformado as (
         UPPER('sin promo') as PROMO_NAME,
         0 / 100 as DISCOUNT,               -- DISCOUNT = 0
         UPPER('inactive') as STATUS,        -- STATUS = 'inactive'
-        UPPER('false') as IS_DELETED,
         convert_timezone('Europe/Berlin', current_timestamp()) as DATE_LOAD
 )
 

@@ -99,6 +99,5 @@ SELECT
     session_id,
     created_at_utc,
     order_id,
-    is_deleted,
     date_load
 FROM unified_events
