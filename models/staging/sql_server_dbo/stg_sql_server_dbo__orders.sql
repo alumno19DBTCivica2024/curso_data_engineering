@@ -35,7 +35,6 @@ renamed_casted AS (
         CONVERT_TIMEZONE('UTC', DELIVERED_AT) AS DELIVERED_AT_UTC,
         TRACKING_ID,
         UPPER(STATUS) as STATUS,
-        UPPER(COALESCE(_FIVETRAN_DELETED, 'false')) as IS_DELETED,
         _FIVETRAN_SYNCED AS DATE_LOAD
     FROM src_orders
 )

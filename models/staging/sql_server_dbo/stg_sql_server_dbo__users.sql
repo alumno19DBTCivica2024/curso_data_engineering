@@ -14,7 +14,6 @@ with src_promos as (
         PHONE_NUMBER,
         UPPER(FIRST_NAME) AS FIRST_NAME,
         EMAIL,
-        _FIVETRAN_DELETED,
         _FIVETRAN_SYNCED
     from {{ source('sql_server_dbo', 'users') }}
 ),
@@ -29,7 +28,6 @@ users_transformado as (
         PHONE_NUMBER,
         FIRST_NAME,
         EMAIL,
-        UPPER(COALESCE(_FIVETRAN_DELETED, 'false')) as IS_DELETED,
         _FIVETRAN_SYNCED AS DATE_LOAD
     from src_promos
 )
