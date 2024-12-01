@@ -15,7 +15,7 @@ dim_promos_gold AS (
         p.status,
         p.discount,
         COUNT(o.order_id) AS total_orders,
-        SUM(o.item_order_cost_usd * (p.discount / 100)) as total_discount_given
+        ROUND(SUM(o.item_order_cost_usd * (p.discount / 100)), 2) as total_discount_given
     FROM stg_promos p
     LEFT JOIN 
         stg_orders o ON p.promo_id = o.promo_id
