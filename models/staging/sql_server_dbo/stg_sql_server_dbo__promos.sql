@@ -1,3 +1,8 @@
+{{
+  config(
+    materialized='view'
+  )
+}}
 with src_promos as (
     select
         --md5(cast(coalesce(cast(PROMO_ID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) as PROMO_ID, -- Genera un hash basado en el valor de PROMO_ID original

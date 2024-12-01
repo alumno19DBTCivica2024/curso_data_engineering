@@ -4,7 +4,7 @@
   )
 }}
 
-with src_promos as (
+with src_users as (
     select
         USER_ID,
         UPDATED_AT,
@@ -29,7 +29,7 @@ users_transformado as (
         FIRST_NAME,
         EMAIL,
         _FIVETRAN_SYNCED AS DATE_LOAD
-    from src_promos
+    from src_users
 )
 
 select * from users_transformado
