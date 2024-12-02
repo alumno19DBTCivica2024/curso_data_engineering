@@ -16,10 +16,6 @@ with src_promos as (
         _FIVETRAN_SYNCED
     from {{ source('sql_server_dbo', 'promos') }}
 ),
-max_synced AS (
-    SELECT MAX(DATE_LOAD) AS max_fivetran_synced
-    FROM {{ this }}
-),
 promos_transformado as (
     select
         PROMO_ID,
@@ -29,7 +25,7 @@ promos_transformado as (
         _FIVETRAN_SYNCED AS DATE_LOAD
     from src_promos
     {% if is_incremental() %}
-	WHERE DATE_LOAD > (SELECT max_fivetran_synced FROM max_synced)
+	    WHERE DATE_LOAD > (   SELECT MAX(DATE_LOAD) FROM {{ this }})
     {% endif %}
 
     union all

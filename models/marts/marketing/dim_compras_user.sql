@@ -1,22 +1,23 @@
+{{
+  config(
+    materialized='table'
+  )
+}}
 WITH dim_users AS (
     SELECT *
     FROM {{ ref('dim_users') }} -- Información del usuario
 ),
 fct_orders AS (
     SELECT *
-    FROM {{ ref('fct_orders') }} -- Información del usuario
-),
-fct_orders AS (
-    SELECT *
-    FROM {{ ref('fct_orders') }} -- Información del usuario
+    FROM {{ ref('fct_orders') }} -- Información del pedido
 ),
 fct_order_items AS (
     SELECT *
-    FROM {{ ref('fct_order_items') }} -- Información del usuario
+    FROM {{ ref('fct_order_items') }} -- Información de los productos de cada pedido
 ),
 dim_address AS (
     SELECT *
-    FROM {{ ref('dim_addresses') }} -- Información del usuario
+    FROM {{ ref('dim_addresses') }} -- Información de direcciones de pedidos y/o usuarios
 ),
 
 dim_orders_aggregated AS (
