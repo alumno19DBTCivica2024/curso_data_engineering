@@ -17,13 +17,17 @@ Características principales:
     - Tiempo total de duración de la sesión (en minutos).
     - Totales de eventos: page_view, add_to_cart, checkout, package_shipped.
 */
-
-WITH stg_sessions AS (
+{{
+  config(
+    materialized='table'
+  )
+}}
+WITH dim_sessions AS (
     SELECT *
     FROM {{ ref('dim_sessions') }}  -- Dimensión de sesiones
 ),
 
-stg_users AS (
+dim_users AS (
     SELECT *
     FROM {{ ref('dim_users') }}  -- Dimensión de usuarios
 ),
@@ -41,8 +45,8 @@ stg_users AS (
             s.checkout_events AS checkout,
             s.package_shipped_events AS package_shipped
         FROM 
-            stg_sessions s 
+            dim_sessions s 
         LEFT JOIN 
-            stg_users u ON s.user_id = u.user_id 
+            dim_users u ON s.user_id = u.user_id 
     )
     SELECT * FROM session_user_details

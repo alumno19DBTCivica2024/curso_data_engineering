@@ -26,10 +26,6 @@ WITH src_order_items AS (
     FROM {{ source('sql_server_dbo', 'order_items') }}
     WHERE quantity > 0 -- Eliminamos valores negativos o no válidos
     ),
-    max_synced AS (
-        SELECT MAX(DATE_LOAD) AS max_fivetran_synced
-        FROM {{ this }}
-    ),
 renamed_casted AS (
     SELECT 
         c.order_id AS ORDER_ID,
@@ -52,7 +48,7 @@ renamed_casted AS (
         _FIVETRAN_SYNCED AS DATE_LOAD
     FROM src_order_items c
     {% if is_incremental() %}
-	    WHERE DATE_LOAD > (SELECT max_fivetran_synced FROM max_synced)
+	    WHERE DATE_LOAD > (   SELECT MAX(DATE_LOAD) FROM {{ this }})
     {% endif %}    
 )
 

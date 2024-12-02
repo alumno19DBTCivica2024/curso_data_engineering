@@ -10,10 +10,6 @@ WITH src_events AS (
     FROM {{ source('sql_server_dbo', 'events') }}
     WHERE EVENT_TYPE = 'page_view'
     ),
-    max_synced AS (
-        SELECT MAX(DATE_LOAD) AS max_fivetran_synced
-        FROM {{ this }}
-    ),
 renamed_casted AS (
     SELECT
           event_id
@@ -28,7 +24,7 @@ renamed_casted AS (
         , _fivetran_synced AS date_load
     FROM src_events
     {% if is_incremental() %}
-        WHERE DATE_LOAD > (SELECT max_fivetran_synced FROM max_synced)
+        WHERE DATE_LOAD > (   SELECT MAX(DATE_LOAD) FROM {{ this }})
     {% endif %}     
     )
 

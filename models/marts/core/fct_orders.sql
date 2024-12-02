@@ -10,10 +10,12 @@
         SELECT *
         FROM {{ref('stg_sql_server_dbo__products')}}        
     ),
+
     stg_events AS (
         SELECT *
         FROM {{ref('stg_sql_server_dbo__events')}}
     ),
+
     stg_promos AS (
         SELECT *
         FROM {{ref('stg_sql_server_dbo__promos')}}

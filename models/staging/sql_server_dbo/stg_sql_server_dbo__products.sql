@@ -15,10 +15,6 @@ with src_products as (
         _FIVETRAN_SYNCED
     from {{ source('sql_server_dbo', 'products') }}
 ),
-max_synced AS (
-    SELECT MAX(DATE_LOAD) AS max_fivetran_synced
-    FROM {{ this }}
-),
 products_transformado as (
     select
         PRODUCT_ID,
@@ -43,7 +39,7 @@ products_transformado as (
         END AS STATUS -- Marca de registros eliminados
     from src_products
     {% if is_incremental() %}
-	    WHERE DATE_LOAD > (SELECT max_fivetran_synced FROM max_synced)
+	    WHERE DATE_LOAD > (   SELECT MAX(DATE_LOAD) FROM {{ this }})
     {% endif %}
 
     union all
