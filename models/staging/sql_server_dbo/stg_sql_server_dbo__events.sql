@@ -5,28 +5,42 @@
 */
 {{
   config(
-    materialized='view'
+    materialized='incremental',
+    unique_key = 'event_id',
+    on_schema_change='fail'
   )
 }}
 
 WITH base_checkout AS (
     SELECT *
     FROM {{ref('base_orders_checkout')}}
+    {% if is_incremental() %}
+	  WHERE date_load > (SELECT MAX(date_load) FROM {{ this }} )
+    {% endif %}
 ),
 
 base_package_shipped AS (
     SELECT *
     FROM {{ref('base_orders_package_shipped')}}
+    {% if is_incremental() %}
+	  WHERE date_load > (SELECT MAX(date_load) FROM {{ this }} )
+    {% endif %}
 ),
 
 base_add_to_cart AS (
     SELECT *
     FROM {{ref('base_orders_add_to_cart')}}
+    {% if is_incremental() %}
+	  WHERE date_load > (SELECT MAX(date_load) FROM {{ this }} )
+    {% endif %}
 ),
 
 base_page_view AS (
     SELECT *
     FROM {{ref('base_orders_page_view')}}
+    {% if is_incremental() %}
+	  WHERE date_load > (SELECT MAX(date_load) FROM {{ this }} )
+    {% endif %}
 ),
 
 -- Unificar bases en una sola estructura

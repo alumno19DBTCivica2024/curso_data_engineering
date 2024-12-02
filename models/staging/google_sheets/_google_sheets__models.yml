@@ -2,20 +2,42 @@ version: 2
 
 models:
   - name: stg_google_sheets__budget
+    description: >
+      Este modelo representa los datos de presupuesto cargados desde Google Sheets, proporcionando información sobre la cantidad presupuestada de productos por mes. 
+      Es parte de la capa staging y se utiliza como base para cálculos y análisis relacionados con presupuestos y productos.
     columns:
-      - name: product_id         
+      - name: _row
+        description: >
+          Identificador único generado automáticamente para cada fila en la fuente de datos de Google Sheets.
+          Se utiliza como clave única para garantizar la consistencia de los datos en el modelo.
+        tests:
+          - unique
+          - not_null  
+      - name: product_id
+        description: >
+          Identificador único del producto relacionado con el presupuesto. 
+          Esta columna establece la relación entre los presupuestos y los productos definidos en el modelo `stg_sql_server_dbo__products`.
         tests:
           - not_null
           - relationships:
-                to: ref('stg_sql_server_dbo__products')
-                field: product_id  
+              to: ref('stg_sql_server_dbo__products')
+              field: product_id  
       - name: quantity
+        description: >
+          Cantidad presupuestada del producto para el mes correspondiente. 
+          Este valor debe ser positivo para garantizar la validez de los datos.
         tests:
           - not_null
           - positive_values    
       - name: month
+        description: >
+          Mes correspondiente al presupuesto, representado en formato `YYYY-MM`. 
+          Este valor indica el periodo en el que se aplica la cantidad presupuestada.
         tests:
           - not_null
       - name: date_load
+        description: >
+          Marca temporal que indica la fecha y hora en que los datos se cargaron desde la fuente original (Google Sheets). 
+          Se utiliza para el seguimiento de cambios incrementales.
         tests:
           - not_null

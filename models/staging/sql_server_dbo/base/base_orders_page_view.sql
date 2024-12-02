@@ -1,12 +1,16 @@
 {{
   config(
-    materialized='view'
+    materialized='incremental',
+    unique_key = 'event_id',
+    on_schema_change='fail'
   )
 }}
-
 WITH src_events AS (
     SELECT * 
     FROM {{ source('sql_server_dbo', 'events') }}
+    {% if is_incremental() %}
+	  WHERE _fivetran_synced > (SELECT MAX(_fivetran_synced) FROM {{ this }} )
+    {% endif %}
     ),
 
 renamed_casted AS (

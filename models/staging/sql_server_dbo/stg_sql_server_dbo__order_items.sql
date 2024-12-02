@@ -10,7 +10,9 @@ Resumen del proceso
 */
 {{
   config(
-    materialized='view'
+    materialized='incremental',
+    unique_key = 'order_id',
+    on_schema_change='fail'
   )
 }}
 
@@ -23,6 +25,9 @@ WITH src_order_items AS (
         _FIVETRAN_SYNCED
     FROM {{ source('sql_server_dbo', 'order_items') }}
     WHERE quantity > 0 -- Eliminamos valores negativos o no válidos
+    {% if is_incremental() %}
+	  WHERE _fivetran_synced > (SELECT MAX(_fivetran_synced) FROM {{ this }} )
+    {% endif %}
     ),
 
 renamed_casted AS (

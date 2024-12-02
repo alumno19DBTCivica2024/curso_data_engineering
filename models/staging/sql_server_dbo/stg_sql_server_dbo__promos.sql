@@ -1,8 +1,10 @@
 {{
   config(
-    materialized='view'
+    materialized='incremental',
+    unique_key = 'promo_id'
   )
 }}
+
 with src_promos as (
     select
         --md5(cast(coalesce(cast(PROMO_ID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) as PROMO_ID, -- Genera un hash basado en el valor de PROMO_ID original
@@ -11,8 +13,11 @@ with src_promos as (
         DISCOUNT,
         STATUS,
         COALESCE(_FIVETRAN_DELETED, 'false') as IS_DELETED,
-        _FIVETRAN_SYNCED as DATE_LOAD
+        _FIVETRAN_SYNCED
     from {{ source('sql_server_dbo', 'promos') }}
+    {% if is_incremental() %}
+    WHERE _fivetran_synced > (SELECT max_date_load FROM max_synced) -- Filtramos los registros nuevos
+    {% endif %}
 ),
 
 promos_transformado as (
@@ -21,7 +26,7 @@ promos_transformado as (
         UPPER(PROMO_NAME) AS PROMO_NAME,
         DISCOUNT/100 as DISCOUNT,
         UPPER(STATUS) AS STATUS,
-        DATE_LOAD
+        _FIVETRAN_SYNCED AS DATE_LOAD
     from src_promos
 
     union all
