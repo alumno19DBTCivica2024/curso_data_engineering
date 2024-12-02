@@ -9,11 +9,11 @@
 WITH src_orders AS (
     SELECT * 
     FROM {{ source('sql_server_dbo', 'orders') }}
-    {% if is_incremental() %}
-	  WHERE _fivetran_synced > (SELECT MAX(_fivetran_synced) FROM {{ this }} )
-    {% endif %}
     ),
-
+    max_synced AS (
+        SELECT MAX(DATE_LOAD) AS max_fivetran_synced
+        FROM {{ this }}
+    ),
 renamed_casted AS (
     SELECT 
         -- Incluir el resto de las columnas tal cual
@@ -42,6 +42,9 @@ renamed_casted AS (
         UPPER(STATUS) as STATUS,
         _FIVETRAN_SYNCED AS DATE_LOAD
     FROM src_orders
+    {% if is_incremental() %}
+	WHERE DATE_LOAD > (SELECT max_fivetran_synced FROM max_synced)
+    {% endif %}
 )
 
 SELECT * FROM renamed_casted
