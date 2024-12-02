@@ -9,11 +9,11 @@
 WITH src_addresses AS (
     SELECT * 
     FROM {{ source('sql_server_dbo', 'addresses') }}
-    {% if is_incremental() %}
-	  WHERE _fivetran_synced > (SELECT MAX(_fivetran_synced) FROM {{ this }} )
-    {% endif %}
     ),
-
+max_synced AS (
+    SELECT MAX(DATE_LOAD) AS max_fivetran_synced
+    FROM {{ this }}
+),
 renamed_addresses_casted AS (
     SELECT
           ADDRESS_ID,
@@ -26,6 +26,9 @@ renamed_addresses_casted AS (
           UPPER(STATE) AS STATE_DESC,
           _FIVETRAN_SYNCED  as DATE_LOAD
     FROM src_addresses
+    {% if is_incremental() %}
+	WHERE DATE_LOAD > (SELECT max_fivetran_synced FROM max_synced)
+    {% endif %}
     )
 
 SELECT * FROM renamed_addresses_casted

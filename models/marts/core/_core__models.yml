@@ -177,11 +177,6 @@ models:
             registrado en la sesión.
           tests:
             - not_null
-        - name: total_events
-          description: >
-            Número total de eventos registrados durante la sesión.
-          tests:
-            - not_null
         - name: page_views
           description: >
             Número total de eventos de tipo "page_view" registrados durante la sesión.

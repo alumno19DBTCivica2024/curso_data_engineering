@@ -9,25 +9,28 @@
 WITH src_events AS (
     SELECT * 
     FROM {{ source('sql_server_dbo', 'events') }}
-    {% if is_incremental() %}
-	  WHERE _fivetran_synced > (SELECT MAX(_fivetran_synced) FROM {{ this }} )
-    {% endif %}
-    ),
-
-renamed_casted AS (
-    SELECT
-          event_id
-        , page_url
-        , user_id
-        , event_type
-        , {{ dbt_utils.generate_surrogate_key(['null']) }} as PRODUCT_ID
-        , session_id
-        , CONVERT_TIMEZONE('UTC', CREATED_AT) AS created_at_utc
-        , order_id
-        , UPPER(COALESCE(_FIVETRAN_DELETED, 'false')) as is_deleted
-        , _fivetran_synced AS date_load
-    FROM src_events
     WHERE EVENT_TYPE = 'checkout'
-    )
+    ),
+    max_synced AS (
+        SELECT MAX(DATE_LOAD) AS max_fivetran_synced
+        FROM {{ this }}
+    ),
+    renamed_casted AS (
+        SELECT
+            event_id
+            , page_url
+            , user_id
+            , event_type
+            , {{ dbt_utils.generate_surrogate_key(['null']) }} as PRODUCT_ID
+            , session_id
+            , CONVERT_TIMEZONE('UTC', CREATED_AT) AS created_at_utc
+            , order_id
+            , UPPER(COALESCE(_FIVETRAN_DELETED, 'false')) as is_deleted
+            , _fivetran_synced AS date_load
+        FROM src_events
+        {% if is_incremental() %}
+            WHERE DATE_LOAD > (SELECT max_fivetran_synced FROM max_synced)
+        {% endif %}        
+        )
 
 SELECT * FROM renamed_casted

@@ -15,11 +15,11 @@ with src_promos as (
         COALESCE(_FIVETRAN_DELETED, 'false') as IS_DELETED,
         _FIVETRAN_SYNCED
     from {{ source('sql_server_dbo', 'promos') }}
-    {% if is_incremental() %}
-    WHERE _fivetran_synced > (SELECT max_date_load FROM max_synced) -- Filtramos los registros nuevos
-    {% endif %}
 ),
-
+max_synced AS (
+    SELECT MAX(DATE_LOAD) AS max_fivetran_synced
+    FROM {{ this }}
+),
 promos_transformado as (
     select
         PROMO_ID,
@@ -28,6 +28,9 @@ promos_transformado as (
         UPPER(STATUS) AS STATUS,
         _FIVETRAN_SYNCED AS DATE_LOAD
     from src_promos
+    {% if is_incremental() %}
+	WHERE DATE_LOAD > (SELECT max_fivetran_synced FROM max_synced)
+    {% endif %}
 
     union all
 

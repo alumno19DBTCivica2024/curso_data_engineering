@@ -9,11 +9,12 @@
 WITH src_events AS (
     SELECT * 
     FROM {{ source('sql_server_dbo', 'events') }}
-    {% if is_incremental() %}
-	  WHERE _fivetran_synced > (SELECT MAX(_fivetran_synced) FROM {{ this }} )
-    {% endif %}
+    WHERE EVENT_TYPE = 'add_to_cart'
     ),
-
+max_synced AS (
+    SELECT MAX(DATE_LOAD) AS max_fivetran_synced
+    FROM {{ this }}
+),
 renamed_casted AS (
     SELECT
           event_id
@@ -27,7 +28,9 @@ renamed_casted AS (
         , UPPER(COALESCE(_FIVETRAN_DELETED, 'false')) as is_deleted
         , _fivetran_synced AS date_load
     FROM src_events
-    WHERE EVENT_TYPE = 'add_to_cart'
+    {% if is_incremental() %}
+	    WHERE DATE_LOAD > (SELECT max_fivetran_synced FROM max_synced)
+    {% endif %}
     )
 
 SELECT * FROM renamed_casted

@@ -12,13 +12,13 @@ with src_products as (
         NAME,
         INVENTORY,
         _FIVETRAN_DELETED AS IS_DELETED,
-        _FIVETRAN_SYNCED  AS DATE_LOAD
+        _FIVETRAN_SYNCED
     from {{ source('sql_server_dbo', 'products') }}
-    {% if is_incremental() %}
-	  WHERE _fivetran_synced > (SELECT MAX(_fivetran_synced) FROM {{ this }} )
-    {% endif %}
 ),
-
+max_synced AS (
+    SELECT MAX(DATE_LOAD) AS max_fivetran_synced
+    FROM {{ this }}
+),
 products_transformado as (
     select
         PRODUCT_ID,
@@ -36,12 +36,15 @@ products_transformado as (
             WHEN INVENTORY = 0 THEN UPPER('Out of Stock')
             ELSE UPPER('In Stock')
         END AS STOCK_STATUS, -- Estado del inventario
-        DATE_LOAD,
+        _FIVETRAN_SYNCED AS DATE_LOAD,
         CASE 
             WHEN IS_DELETED = TRUE THEN 'DELETED'
             ELSE 'ACTIVE'
         END AS STATUS -- Marca de registros eliminados
     from src_products
+    {% if is_incremental() %}
+	    WHERE DATE_LOAD > (SELECT max_fivetran_synced FROM max_synced)
+    {% endif %}
 
     union all
 
