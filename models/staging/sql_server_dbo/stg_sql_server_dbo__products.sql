@@ -1,9 +1,10 @@
 {{
   config(
-    materialized='view'
+    materialized='incremental',
+    unique_key = 'product_id',
+    on_schema_change='fail'
   )
 }}
-
 with src_products as (
     select
         PRODUCT_ID,
@@ -13,6 +14,9 @@ with src_products as (
         _FIVETRAN_DELETED AS IS_DELETED,
         _FIVETRAN_SYNCED  AS DATE_LOAD
     from {{ source('sql_server_dbo', 'products') }}
+    {% if is_incremental() %}
+	  WHERE _fivetran_synced > (SELECT MAX(_fivetran_synced) FROM {{ this }} )
+    {% endif %}
 ),
 
 products_transformado as (

@@ -1,10 +1,17 @@
 {{
   config(
-    materialized='view'
+    materialized='incremental',
+    unique_key = 'user_id'
   )
 }}
 
-with src_users as (
+-- CTE para calcular el valor máximo de _fivetran_synced
+
+WITH max_synced AS (
+    SELECT COALESCE(MAX(date_load), '1900-01-01') AS max_date_load
+    FROM {{ this }}
+),
+src_users as (
     select
         USER_ID,
         UPDATED_AT,
@@ -16,6 +23,9 @@ with src_users as (
         EMAIL,
         _FIVETRAN_SYNCED
     from {{ source('sql_server_dbo', 'users') }}
+    {% if is_incremental() %}
+    WHERE _fivetran_synced > (SELECT max_date_load FROM max_synced) -- Filtramos los registros nuevos
+    {% endif %}
 ),
 
 users_transformado as (
