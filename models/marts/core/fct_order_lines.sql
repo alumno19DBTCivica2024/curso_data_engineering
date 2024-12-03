@@ -1,7 +1,10 @@
-{{ config(
-    materialized='table'
-    ) 
-    }}
+{{
+  config(
+    materialized='incremental',
+    unique_key = 'order_id',
+    on_schema_change='fail'
+  )
+}}
 WITH stg_orders AS (
     SELECT * FROM {{ ref('stg_sql_server_dbo__orders') }}
 ),
@@ -29,11 +32,15 @@ fct_order_lines AS (
         (oi.quantity * p.price * (pr.discount / 100)) AS discount_applied,
         ROUND((o.shipping_cost_usd / COUNT(oi.product_id) OVER (PARTITION BY o.order_id)),2) AS shipping_cost,
         DATEDIFF('DAY', o.created_at_utc, o.delivered_at_utc) AS delivery_time_days,
-        o.status AS order_status
+        o.status AS order_status,
+        o.DATE_LOAD
     FROM stg_orders o 
     LEFT JOIN stg_order_items oi ON o.order_id = oi.order_id
     LEFT JOIN stg_products p ON oi.product_id = p.product_id
     LEFT JOIN stg_promos pr ON o.promo_id = pr.promo_id
+    {% if is_incremental() %}
+	    WHERE o.DATE_LOAD > (   SELECT MAX(o.DATE_LOAD) FROM {{ this }} o)
+    {% endif %}    
     )
 
 SELECT * FROM fct_order_lines

@@ -1,3 +1,10 @@
+{{
+  config(
+    materialized='incremental',
+    unique_key = 'session_id',
+    on_schema_change='fail'
+  )
+}}
 WITH stg_events AS (
     SELECT *
     FROM {{ ref('stg_sql_server_dbo__events') }}
@@ -18,11 +25,15 @@ dim_sessions_gold AS (
         ec.page_view_amount AS page_views,                -- Conteo dinámico de "page_view"
         ec.add_to_cart_amount AS add_to_cart_events,      -- Conteo dinámico de "add_to_cart"
         ec.checkout_amount AS checkout_events,            -- Conteo dinámico de "checkout"
-        ec.package_shipped_amount AS package_shipped_events -- Conteo dinámico de "package_shipped"
+        ec.package_shipped_amount AS package_shipped_events, -- Conteo dinámico de "package_shipped"
+        ev.DATE_LOAD
     FROM stg_events ev
     LEFT JOIN event_counts ec                              -- Relacionar con los conteos de eventos
     ON ev.user_id = ec.user_id                             -- Relación por usuario
-    GROUP BY ev.session_id, ev.user_id, ec.page_view_amount, ec.add_to_cart_amount, ec.checkout_amount, ec.package_shipped_amount
+    {% if is_incremental() %}
+	    WHERE ev.DATE_LOAD > (   SELECT MAX(ev.DATE_LOAD) FROM {{ this }} ev)
+    {% endif %}
+    GROUP BY ev.session_id, ev.user_id, ec.page_view_amount, ec.add_to_cart_amount, ec.checkout_amount, ec.package_shipped_amount, ev.DATE_LOAD
 )
 
 SELECT * FROM dim_sessions_gold
