@@ -28,6 +28,8 @@
             o.address_id,
             o.promo_id,
             e.session_id,
+            o.created_at_utc,
+            o.delivered_at_utc,
             o.total_order_cost_usd, -- Coste total incluyendo envío
             o.item_order_cost_usd,  -- Coste total de los productos
             o.shipping_cost_usd,    -- Coste del envío
