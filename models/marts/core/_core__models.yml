@@ -281,7 +281,7 @@ models:
             Fecha y hora en la que se entregó el pedido.
           tests:
             - not_null
-    - name: fact_order_items_gold
+    - name: fact_order_items
       description: >
         Tabla de hechos que captura información detallada sobre los productos dentro de los pedidos. 
         Cada fila representa un producto específico dentro de un pedido e incluye métricas clave como 
@@ -346,3 +346,72 @@ models:
             - not_null
             - accepted_range:
                 min_value: 0
+    - name: fact_order_lines
+      description: >
+        Tabla de hechos que representa los detalles a nivel de línea de los pedidos, enriquecida con información de productos, promociones y métricas calculadas como descuentos y costos de envío.
+      columns:
+        - name: order_id
+          description: "Identificador único para cada pedido."
+          tests:
+            - not_null
+            - unique
+        - name: product_id
+          description: "Identificador único para el producto en la línea de pedido."
+          tests:
+            - not_null
+            - relationships:
+                to: ref('stg_sql_server_dbo__products')
+                field: product_id
+        - name: user_id
+          description: "Identificador único del usuario que realizó el pedido."
+          tests:
+            - not_null
+        - name: address_id
+          description: "Identificador único de la dirección de entrega."
+          tests:
+            - not_null
+        - name: promo_id
+          description: "Identificador único para la promoción aplicada al pedido, si existe."
+          tests:
+            - relationships:
+                to: ref('stg_sql_server_dbo__promos')
+                field: promo_id
+        - name: created_at_utc
+          description: "Marca de tiempo que indica cuándo se creó el pedido."
+          tests:
+            - not_null
+        - name: delivered_at_utc
+          description: "Marca de tiempo que indica cuándo se entregó el pedido."
+          tests:
+            - not_null
+        - name: quantity
+          description: "Cantidad del producto en la línea de pedido."
+          tests:
+            - not_null
+            - positive_values
+        - name: unit_price_usd
+          description: "Precio unitario del producto en USD."
+          tests:
+            - not_null
+        - name: line_total_price
+          description: "Precio total de la línea (cantidad * precio unitario)."
+          tests:
+            - not_null
+        - name: discount_applied
+          description: "Descuento aplicado a la línea de pedido basado en la promoción asociada."
+          tests:
+            - not_null
+        - name: shipping_cost
+          description: >
+            Coste de envío asignado a la línea de pedido, calculado en función del coste total de envío del pedido.
+          tests:
+            - not_null
+        - name: delivery_time_days
+          description: >
+            Número de días que tomó entregar el pedido desde su creación.
+          tests:
+            - not_null
+        - name: order_status
+          description: "Estado actual del pedido (e.g., pendiente, enviado, entregado)."
+          tests:
+            - not_null

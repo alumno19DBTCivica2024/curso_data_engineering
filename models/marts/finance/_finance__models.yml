@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: dim_budget
+  - name: fct_budget
     columns:
       - name: product_id 
         description: >
