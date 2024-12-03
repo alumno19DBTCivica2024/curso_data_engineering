@@ -8,11 +8,13 @@
 WITH ventas_prod_mes AS (
     SELECT 
         ol.product_id,
+        p.name,
         CAST(DATE_TRUNC('month', ol.created_at_utc) AS DATE) AS month, -- Convertir TIMESTAMPZ a DATE
         SUM(ol.quantity) AS sold_quantity,
         SUM(ol.line_total_price) AS revenue_real
     FROM {{ ref('fct_order_lines') }} ol
-    GROUP BY ol.product_id, CAST(DATE_TRUNC('month', ol.created_at_utc) AS DATE)
+        INNER JOIN {{ref('dim_products')}} p ON ol.product_id = p.product_id
+    GROUP BY ol.product_id, CAST(DATE_TRUNC('month', ol.created_at_utc) AS DATE), p.name
 ),
 
 presupuesto_prod_mes AS (
@@ -34,6 +36,7 @@ unit_price_prod AS (
 comparacion_presupuesto AS (
     SELECT 
         p.product_id,
+        v.name,
         p.month AS P_month,
         v.month AS V_month,
         p.budget_quantity,
